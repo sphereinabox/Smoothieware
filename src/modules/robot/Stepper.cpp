@@ -59,6 +59,7 @@ void Stepper::on_module_loaded(){
     THEKERNEL->robot->alpha_stepper_motor->attach(this, &Stepper::stepper_motor_finished_move );
     THEKERNEL->robot->beta_stepper_motor->attach( this, &Stepper::stepper_motor_finished_move );
     THEKERNEL->robot->gamma_stepper_motor->attach(this, &Stepper::stepper_motor_finished_move );
+    THEKERNEL->robot->delta_stepper_motor->attach(this, &Stepper::stepper_motor_finished_move );
 }
 
 // Get configuration from the config file
@@ -77,6 +78,7 @@ void Stepper::on_pause(void* argument){
     THEKERNEL->robot->alpha_stepper_motor->pause();
     THEKERNEL->robot->beta_stepper_motor->pause();
     THEKERNEL->robot->gamma_stepper_motor->pause();
+    THEKERNEL->robot->delta_stepper_motor->pause();
 }
 
 // When the play/pause button is set to play, or a module calls the ON_PLAY event
@@ -86,6 +88,7 @@ void Stepper::on_play(void* argument){
     THEKERNEL->robot->alpha_stepper_motor->unpause();
     THEKERNEL->robot->beta_stepper_motor->unpause();
     THEKERNEL->robot->gamma_stepper_motor->unpause();
+    THEKERNEL->robot->delta_stepper_motor->unpause();
 }
 
 void Stepper::on_gcode_received(void* argument){
@@ -132,7 +135,7 @@ void Stepper::on_block_begin(void* argument){
     if( block->millimeters == 0.0F ){ return; }
 
     // Mark the new block as of interrest to us
-    if( block->steps[ALPHA_STEPPER] > 0 || block->steps[BETA_STEPPER] > 0 || block->steps[GAMMA_STEPPER] > 0 ){
+    if( block->steps[ALPHA_STEPPER] > 0 || block->steps[BETA_STEPPER] > 0 || block->steps[GAMMA_STEPPER] > 0 || block->steps[DELTA_STEPPER] > 0 ){
         block->take();
     }else{
         return;
@@ -147,6 +150,7 @@ void Stepper::on_block_begin(void* argument){
     if( block->steps[ALPHA_STEPPER] > 0 ){ THEKERNEL->robot->alpha_stepper_motor->move( ( block->direction_bits >> 0  ) & 1 , block->steps[ALPHA_STEPPER] ); }
     if( block->steps[BETA_STEPPER ] > 0 ){ THEKERNEL->robot->beta_stepper_motor->move(  ( block->direction_bits >> 1  ) & 1 , block->steps[BETA_STEPPER ] ); }
     if( block->steps[GAMMA_STEPPER] > 0 ){ THEKERNEL->robot->gamma_stepper_motor->move( ( block->direction_bits >> 2  ) & 1 , block->steps[GAMMA_STEPPER] ); }
+    if( block->steps[DELTA_STEPPER] > 0 ){ THEKERNEL->robot->delta_stepper_motor->move( ( block->direction_bits >> 3  ) & 1 , block->steps[DELTA_STEPPER] ); }
 
     this->current_block = block;
 
@@ -157,6 +161,7 @@ void Stepper::on_block_begin(void* argument){
     this->main_stepper = THEKERNEL->robot->alpha_stepper_motor;
     if( THEKERNEL->robot->beta_stepper_motor->steps_to_move > this->main_stepper->steps_to_move ){ this->main_stepper = THEKERNEL->robot->beta_stepper_motor; }
     if( THEKERNEL->robot->gamma_stepper_motor->steps_to_move > this->main_stepper->steps_to_move ){ this->main_stepper = THEKERNEL->robot->gamma_stepper_motor; }
+    if( THEKERNEL->robot->delta_stepper_motor->steps_to_move > this->main_stepper->steps_to_move ){ this->main_stepper = THEKERNEL->robot->delta_stepper_motor; }
 
     // Set the initial speed for this move
     this->trapezoid_generator_tick(0);
@@ -175,7 +180,7 @@ void Stepper::on_block_end(void* argument){
 uint32_t Stepper::stepper_motor_finished_move(uint32_t dummy){
 
     // We care only if none is still moving
-    if( THEKERNEL->robot->alpha_stepper_motor->moving || THEKERNEL->robot->beta_stepper_motor->moving || THEKERNEL->robot->gamma_stepper_motor->moving ){ return 0; }
+    if( THEKERNEL->robot->alpha_stepper_motor->moving || THEKERNEL->robot->beta_stepper_motor->moving || THEKERNEL->robot->gamma_stepper_motor->moving || THEKERNEL->robot->delta_stepper_motor->moving ){ return 0; }
 
     // This block is finished, release it
     if( this->current_block != NULL ){
@@ -267,6 +272,7 @@ void Stepper::set_step_events_per_second( float steps_per_second )
     if( THEKERNEL->robot->alpha_stepper_motor->moving ){ THEKERNEL->robot->alpha_stepper_motor->set_speed( steps_per_second * ( (float)this->current_block->steps[ALPHA_STEPPER] / (float)this->current_block->steps_event_count ) ); }
     if( THEKERNEL->robot->beta_stepper_motor->moving  ){ THEKERNEL->robot->beta_stepper_motor->set_speed(  steps_per_second * ( (float)this->current_block->steps[BETA_STEPPER ] / (float)this->current_block->steps_event_count ) ); }
     if( THEKERNEL->robot->gamma_stepper_motor->moving ){ THEKERNEL->robot->gamma_stepper_motor->set_speed( steps_per_second * ( (float)this->current_block->steps[GAMMA_STEPPER] / (float)this->current_block->steps_event_count ) ); }
+    if( THEKERNEL->robot->delta_stepper_motor->moving ){ THEKERNEL->robot->delta_stepper_motor->set_speed( steps_per_second * ( (float)this->current_block->steps[DELTA_STEPPER] / (float)this->current_block->steps_event_count ) ); }
 
     // Other modules might want to know the speed changed
     THEKERNEL->call_event(ON_SPEED_CHANGE, this);

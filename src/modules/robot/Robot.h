@@ -91,6 +91,7 @@ class Robot : public Module {
         StepperMotor* alpha_stepper_motor;
         StepperMotor* beta_stepper_motor;
         StepperMotor* gamma_stepper_motor;
+        StepperMotor* delta_stepper_motor;
 
         std::vector<StepperMotor*> actuators;
 

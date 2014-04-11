@@ -50,7 +50,7 @@ class Block {
         //vector<float> travel_distances;
         vector<Gcode> gcodes;
 
-        unsigned int   steps[3];           // Number of steps for each axis for this block
+        unsigned int   steps[4];           // Number of steps for each axis for this block
         unsigned int   steps_event_count;  // Steps for the longest axis
         unsigned int   nominal_rate;       // Nominal rate in steps per second
         float          nominal_speed;      // Nominal speed in mm per second

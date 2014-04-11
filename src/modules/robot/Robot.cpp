@@ -26,6 +26,7 @@ using std::string;
 #include "arm_solutions/RostockSolution.h"
 #include "arm_solutions/JohannKosselSolution.h"
 #include "arm_solutions/HBotSolution.h"
+#include "arm_solutions/XPlotterSolution.h"
 
 #define  default_seek_rate_checksum          CHECKSUM("default_seek_rate")
 #define  default_feed_rate_checksum          CHECKSUM("default_feed_rate")
@@ -46,25 +47,31 @@ using std::string;
 #define  hbot_checksum                       CHECKSUM("hbot")
 #define  corexy_checksum                     CHECKSUM("corexy")
 #define  kossel_checksum                     CHECKSUM("kossel")
+#define  xplotter_checksum                   CHECKSUM("xplotter")
 
 // stepper motor stuff
 #define  alpha_step_pin_checksum             CHECKSUM("alpha_step_pin")
 #define  beta_step_pin_checksum              CHECKSUM("beta_step_pin")
 #define  gamma_step_pin_checksum             CHECKSUM("gamma_step_pin")
+#define  delta_step_pin_checksum             CHECKSUM("delta_step_pin")
 #define  alpha_dir_pin_checksum              CHECKSUM("alpha_dir_pin")
 #define  beta_dir_pin_checksum               CHECKSUM("beta_dir_pin")
 #define  gamma_dir_pin_checksum              CHECKSUM("gamma_dir_pin")
+#define  delta_dir_pin_checksum              CHECKSUM("delta_dir_pin")
 #define  alpha_en_pin_checksum               CHECKSUM("alpha_en_pin")
 #define  beta_en_pin_checksum                CHECKSUM("beta_en_pin")
 #define  gamma_en_pin_checksum               CHECKSUM("gamma_en_pin")
+#define  delta_en_pin_checksum               CHECKSUM("delta_en_pin")
 
 #define  alpha_steps_per_mm_checksum         CHECKSUM("alpha_steps_per_mm")
 #define  beta_steps_per_mm_checksum          CHECKSUM("beta_steps_per_mm")
 #define  gamma_steps_per_mm_checksum         CHECKSUM("gamma_steps_per_mm")
+#define  delta_steps_per_mm_checksum         CHECKSUM("delta_steps_per_mm")
 
 #define  alpha_max_rate_checksum             CHECKSUM("alpha_max_rate")
 #define  beta_max_rate_checksum              CHECKSUM("beta_max_rate")
 #define  gamma_max_rate_checksum             CHECKSUM("gamma_max_rate")
+#define  delta_max_rate_checksum             CHECKSUM("delta_max_rate")
 
 
 // new-style actuator stuff
@@ -80,6 +87,7 @@ using std::string;
 #define  alpha_checksum                      CHECKSUM("alpha")
 #define  beta_checksum                       CHECKSUM("beta")
 #define  gamma_checksum                      CHECKSUM("gamma")
+#define  delta_checksum                      CHECKSUM("delta")
 
 
 // The Robot converts GCodes into actual movements, and then adds them to the Planner, which passes them to the Conveyor so they can be added to the queue
@@ -132,6 +140,9 @@ void Robot::on_config_reload(void* argument){
     }else if(solution_checksum == rotatable_cartesian_checksum) {
         this->arm_solution = new RotatableCartesianSolution(THEKERNEL->config);
 
+    }else if(solution_checksum == xplotter_checksum) {
+        this->arm_solution = new XPlotterSolution(THEKERNEL->config);
+
     }else if(solution_checksum == cartesian_checksum) {
         this->arm_solution = new CartesianSolution(THEKERNEL->config);
 
@@ -160,6 +171,9 @@ void Robot::on_config_reload(void* argument){
     Pin gamma_step_pin;
     Pin gamma_dir_pin;
     Pin gamma_en_pin;
+    Pin delta_step_pin;
+    Pin delta_dir_pin;
+    Pin delta_en_pin;
 
     alpha_step_pin.from_string( THEKERNEL->config->value(alpha_step_pin_checksum )->by_default("2.0"  )->as_string())->as_output();
     alpha_dir_pin.from_string(  THEKERNEL->config->value(alpha_dir_pin_checksum  )->by_default("0.5"  )->as_string())->as_output();
@@ -170,11 +184,15 @@ void Robot::on_config_reload(void* argument){
     gamma_step_pin.from_string( THEKERNEL->config->value(gamma_step_pin_checksum )->by_default("2.2"  )->as_string())->as_output();
     gamma_dir_pin.from_string(  THEKERNEL->config->value(gamma_dir_pin_checksum  )->by_default("0.20" )->as_string())->as_output();
     gamma_en_pin.from_string(   THEKERNEL->config->value(gamma_en_pin_checksum   )->by_default("0.19" )->as_string())->as_output();
+    delta_step_pin.from_string( THEKERNEL->config->value(delta_step_pin_checksum )->by_default("2.3"  )->as_string())->as_output();
+    delta_dir_pin.from_string(  THEKERNEL->config->value(delta_dir_pin_checksum  )->by_default("0.22" )->as_string())->as_output();
+    delta_en_pin.from_string(   THEKERNEL->config->value(delta_en_pin_checksum   )->by_default("0.21" )->as_string())->as_output();
 
-    float steps_per_mm[3] = {
+    float steps_per_mm[4] = {
         THEKERNEL->config->value(alpha_steps_per_mm_checksum)->by_default(  80.0F)->as_number(),
         THEKERNEL->config->value(beta_steps_per_mm_checksum )->by_default(  80.0F)->as_number(),
         THEKERNEL->config->value(gamma_steps_per_mm_checksum)->by_default(2560.0F)->as_number(),
+        THEKERNEL->config->value(delta_steps_per_mm_checksum)->by_default(80.0F)->as_number(),
     };
 
     // TODO: delete or detect old steppermotors
@@ -182,25 +200,29 @@ void Robot::on_config_reload(void* argument){
     this->alpha_stepper_motor  = THEKERNEL->step_ticker->add_stepper_motor( new StepperMotor(alpha_step_pin, alpha_dir_pin, alpha_en_pin) );
     this->beta_stepper_motor   = THEKERNEL->step_ticker->add_stepper_motor( new StepperMotor(beta_step_pin,  beta_dir_pin,  beta_en_pin ) );
     this->gamma_stepper_motor  = THEKERNEL->step_ticker->add_stepper_motor( new StepperMotor(gamma_step_pin, gamma_dir_pin, gamma_en_pin) );
+    this->delta_stepper_motor  = THEKERNEL->step_ticker->add_stepper_motor( new StepperMotor(delta_step_pin, delta_dir_pin, delta_en_pin) );
 
     alpha_stepper_motor->change_steps_per_mm(steps_per_mm[0]);
     beta_stepper_motor->change_steps_per_mm(steps_per_mm[1]);
     gamma_stepper_motor->change_steps_per_mm(steps_per_mm[2]);
+    delta_stepper_motor->change_steps_per_mm(steps_per_mm[3]);
 
     alpha_stepper_motor->max_rate = THEKERNEL->config->value(alpha_max_rate_checksum)->by_default(30000.0F)->as_number() / 60.0F;
     beta_stepper_motor->max_rate  = THEKERNEL->config->value(beta_max_rate_checksum )->by_default(30000.0F)->as_number() / 60.0F;
     gamma_stepper_motor->max_rate = THEKERNEL->config->value(gamma_max_rate_checksum)->by_default(30000.0F)->as_number() / 60.0F;
+    delta_stepper_motor->max_rate = THEKERNEL->config->value(delta_max_rate_checksum)->by_default(30000.0F)->as_number() / 60.0F;
 
     actuators.clear();
     actuators.push_back(alpha_stepper_motor);
     actuators.push_back(beta_stepper_motor);
     actuators.push_back(gamma_stepper_motor);
+    actuators.push_back(delta_stepper_motor);
 
     // initialise actuator positions to current cartesian position (X0 Y0 Z0)
     // so the first move can be correct if homing is not performed
-    float actuator_pos[3];
+    float actuator_pos[4];
     arm_solution->cartesian_to_actuator(last_milestone, actuator_pos);
-    for (int i = 0; i < 3; i++)
+    for (int i = 0; i < 4; i++)
         actuators[i]->change_last_milestone(actuator_pos[i]);
 }
 
@@ -276,10 +298,10 @@ void Robot::on_gcode_received(void * argument){
                 }
 
                 // TODO: handle any number of actuators
-                float actuator_pos[3];
+                float actuator_pos[4];
                 arm_solution->cartesian_to_actuator(last_milestone, actuator_pos);
 
-                for (int i = 0; i < 3; i++)
+                for (int i = 0; i < 4; i++)
                     actuators[i]->change_last_milestone(actuator_pos[i]);
 
                 gcode->mark_as_taken();
@@ -479,10 +501,10 @@ void Robot::distance_in_gcode_is_known(Gcode* gcode){
 void Robot::reset_axis_position(float position, int axis) {
     this->last_milestone[axis] = position;
 
-    float actuator_pos[3];
+    float actuator_pos[4];
     arm_solution->cartesian_to_actuator(last_milestone, actuator_pos);
 
-    for (int i = 0; i < 3; i++)
+    for (int i = 0; i < 4; i++)
         actuators[i]->change_last_milestone(actuator_pos[i]);
 }
 
@@ -492,7 +514,7 @@ void Robot::append_milestone( float target[], float rate_mm_s )
 {
     float deltas[3];
     float unit_vec[3];
-    float actuator_pos[3];
+    float actuator_pos[4];
     float millimeters_of_travel;
 
     // find distance moved by each axis
@@ -522,7 +544,7 @@ void Robot::append_milestone( float target[], float rate_mm_s )
     arm_solution->cartesian_to_actuator( target, actuator_pos );
 
     // check per-actuator speed limits
-    for (int actuator = 0; actuator <= 2; actuator++)
+    for (int actuator = 0; actuator < 4; actuator++)
     {
         float actuator_rate  = fabs(actuator_pos[actuator] - actuators[actuator]->last_milestone_mm) * rate_mm_s / millimeters_of_travel;
 

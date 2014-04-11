@@ -31,6 +31,7 @@ using std::string;
 #define ALPHA_STEPPER 0
 #define BETA_STEPPER 1
 #define GAMMA_STEPPER 2
+#define DELTA_STEPPER 3
 
 #define clear_vector(a) memset(a, 0, sizeof(a))
 #define clear_vector_float(a) memset(a, 0.0F, sizeof(a))

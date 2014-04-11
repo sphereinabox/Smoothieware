@@ -54,7 +54,7 @@ void Planner::append_block( float actuator_pos[], float rate_mm_s, float distanc
 
     // Direction bits
     block->direction_bits = 0;
-    for (int i = 0; i < 3; i++)
+    for (int i = 0; i < 4; i++)
     {
         int steps = THEKERNEL->robot->actuators[i]->steps_to_target(actuator_pos[i]);
 
@@ -69,7 +69,7 @@ void Planner::append_block( float actuator_pos[], float rate_mm_s, float distanc
     }
 
     // Max number of steps, for all axes
-    block->steps_event_count = max( block->steps[ALPHA_STEPPER], max( block->steps[BETA_STEPPER], block->steps[GAMMA_STEPPER] ) );
+    block->steps_event_count = max( block->steps[ALPHA_STEPPER], max( block->steps[BETA_STEPPER], max(block->steps[GAMMA_STEPPER], block->steps[DELTA_STEPPER]) ) );
 
     block->millimeters = distance;
 
