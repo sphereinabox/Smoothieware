@@ -21,7 +21,7 @@ const int servoPin = A1;
 //const int servoAngleDown = 150;
 //const int servoAngleUp = 120;
 const int servoAngleDown = 180;
-const int servoAngleUp = 120;
+const int servoAngleUp = 100;
  
 
 Servo servo; 
