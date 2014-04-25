@@ -7,10 +7,10 @@ delta_segments_per_second                    200              # for deltas only 
 
 # Arm solution configuration : Cartesian robot. Translates mm positions into stepper positions
 arm_solution                                 xplotter         # selects the X Plotter arm solution
-alpha_steps_per_mm                           33               # Steps per mm for alpha stepper
-beta_steps_per_mm                            33               # Steps per mm for beta stepper
-gamma_steps_per_mm                           33               # Steps per mm for gamma stepper
-delta_steps_per_mm                           33               # Steps per mm for delta stepper
+alpha_steps_per_mm                           32               # Steps per mm for alpha stepper
+beta_steps_per_mm                            32               # Steps per mm for beta stepper
+gamma_steps_per_mm                           32               # Steps per mm for gamma stepper
+delta_steps_per_mm                           32               # Steps per mm for delta stepper
 
 # Planner module configuration : Look-ahead and acceleration configuration
 planner_queue_size                           64               # Size of the planning queue, must be a power of 2. 128 seems to be the maximum.
@@ -30,29 +30,31 @@ z_axis_max_speed                             300              # mm/min
 
 # Stepper module pins ( ports, and pin numbers, appending "!" to the number will invert a pin )
 alpha_step_pin                               2.0              # Pin for alpha stepper step signal
-alpha_dir_pin                                0.5              # Pin for alpha stepper direction
+alpha_dir_pin                                0.5!             # Pin for alpha stepper direction
 alpha_en_pin                                 0.4              # Pin for alpha enable pin
 alpha_current                                1.0              # Alpha stepper motor current
 
-beta_step_pin                                2.3              # Pin for beta stepper step signal
-beta_dir_pin                                 0.22             # Pin for beta stepper direction
-beta_en_pin                                  0.21             # Pin for beta enable
+beta_step_pin                                2.1              # Pin for beta stepper step signal
+beta_dir_pin                                 0.11             # Pin for beta stepper direction
+beta_en_pin                                  0.10             # Pin for beta enable
 beta_current                                 1.0              # Beta stepper motor current
 
 gamma_step_pin                               2.2              # Pin for gamma stepper step signal
-gamma_dir_pin                                0.20             # Pin for gamma stepper direction
+gamma_dir_pin                                0.20!            # Pin for gamma stepper direction
 gamma_en_pin                                 0.19             # Pin for gamma enable
 gamma_current                                1.0              # Gamma stepper motor current
 
-delta_step_pin                               2.1              # Pin for delta step signal
-delta_dir_pin                                0.11             # Pin for delta dir signal
-delta_en_pin                                 0.10             # Pin for delta enable signal
+delta_step_pin                               2.3              # Pin for delta step signal
+delta_dir_pin                                0.22             # Pin for delta dir signal
+delta_en_pin                                 0.21             # Pin for delta enable signal
 delta_current                                1.0              # Delta stepper motor current
 
 # ZAR plotter machine size
 # Machine width minus carriage width
-zar_cartesian_width                          1111.0
-zar_cartesian_height                         1111.0
+# 30in wide, 24in tall
+# 70mm square carriage
+zar_cartesian_width                          692.0
+zar_cartesian_height                         539.6
 zar_cartesian_depth                          0.0
 
 # Serial communications configuration ( baud rate default to 9600 if undefined )
