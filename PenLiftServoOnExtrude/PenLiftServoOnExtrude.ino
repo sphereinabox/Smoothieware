@@ -14,14 +14,11 @@ epsilon_current                              1.5              # Extruder stepper
 
 */
 #include <Servo.h> 
-const int buttonPin = A0;
+const int buttonPin = A3;
 const int ledPin = 13; 
 const int servoPin = A1;
-// servo angles range from 0 through 180
-//const int servoAngleDown = 150;
-//const int servoAngleUp = 120;
-const int servoAngleDown = 180;
-const int servoAngleUp = 100;
+const int servoAnglePinDown = A0;
+const int servoAnglePinUp = A2;
  
 
 Servo servo; 
@@ -34,14 +31,17 @@ void setup() {
 
 void loop(){
   int buttonState = digitalRead(buttonPin);
+  int val;
+  digitalWrite(ledPin, buttonState);
 
   if (buttonState == HIGH) {     
-    digitalWrite(ledPin, HIGH);
-    servo.write(servoAngleDown);
+    val = analogRead(servoAnglePinUp);            // reads the value of the potentiometer (value between 0 and 1023) 
   } 
   else {
     digitalWrite(ledPin, LOW); 
-    servo.write(servoAngleUp);
+    val = analogRead(servoAnglePinDown);
   }
+  val = map(val, 0, 1023, 0, 179);     // scale it to use it with the servo (value between 0 and 180) 
+  servo.write(val);
 }
 
