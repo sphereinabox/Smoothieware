@@ -24,8 +24,8 @@ microseconds_per_step_pulse                  1                # Duration of step
 minimum_steps_per_minute                     1200             # Never step slower than this
 base_stepping_frequency                      100000           # Base frequency for stepping, higher gives smoother movement
 
-x_axis_max_speed                             30000            # mm/min
-y_axis_max_speed                             30000            # mm/min
+x_axis_max_speed                             60000            # mm/min
+y_axis_max_speed                             60000            # mm/min
 z_axis_max_speed                             300              # mm/min
 
 # Stepper module pins ( ports, and pin numbers, appending "!" to the number will invert a pin )
@@ -51,8 +51,10 @@ delta_current                                1.0              # Delta stepper mo
 
 # ZAR plotter machine size
 # Machine width minus carriage width
-zar_cartesian_width                          1159.0
-zar_cartesian_height                         1159.0
+# 53.875in wide, 38.75in tall
+# 70mm square carriage
+zar_cartesian_width                          1300.0
+zar_cartesian_height                         914.2
 zar_cartesian_depth                          0.0
 
 # Serial communications configuration ( baud rate default to 9600 if undefined )
