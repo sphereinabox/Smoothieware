@@ -149,23 +149,25 @@ gamma_homing_retract_mm                      1                # "
 # Pause button
 pause_button_enable                          true             #
 
+
 # Panel
-panel.enable                                 false             # set to true to enable the panel code
-panel.lcd                                    smoothiepanel     # set type of panel also viki_lcd, i2c_lcd is a generic i2c panel, panelolu2
-panel.encoder_a_pin                          1.22!^            # encoder pin
-panel.encoder_b_pin                          1.23!^            # encoder pin
+panel.enable                                 true             # set to true to enable the panel code
+#panel.lcd                                    smoothiepanel     # set type of panel 
+#panel.encoder_a_pin                          3.25!^            # encoder pin
+panel.encoder_b_pin                          3.26!^            # encoder pin
 
 # Example for reprap discount GLCD
 # on glcd EXP1 is to left and EXP2 is to right, pin 1 is bottom left, pin 2 is top left etc.
 # +5v is EXP1 pin 10, Gnd is EXP1 pin 9
-#panel.lcd                                   reprap_discount_glcd     #
-#panel.spi_channel                           0                 # spi channel to use  ; GLCD EXP1 Pins 3,5 (MOSI, SCLK)
-#panel.spi_cs_pin                            0.16              # spi chip select     ; GLCD EXP1 Pin 4
-#panel.encoder_a_pin                         1.22!^            # encoder pin         ; GLCD EXP2 Pin 3
-#panel.encoder_b_pin                         1.23!^            # encoder pin         ; GLCD EXP2 Pin 5
-#panel.click_button_pin                      1.30!^            # click button        ; GLCD EXP1 Pin 2
-#panel.buzz_pin                              1.31              # pin for buzzer      ; GLCD EXP1 Pin 1
-#panel.button_pause_pin                      2.11^             # kill/pause          ; GLCD EXP2 Pin 8
+panel.lcd                                   reprap_discount_glcd     #
+panel.spi_channel                           0                 # spi channel to use  ; GLCD EXP1 Pins 3,5 (MOSI, SCLK)
+panel.spi_cs_pin                            0.16              # spi chip select     ; GLCD EXP1 Pin 4
+panel.encoder_a_pin                         3.25!^            # encoder pin         ; GLCD EXP2 Pin 3
+panel.encoder_b_pin                         3.26!^            # encoder pin         ; GLCD EXP2 Pin 5
+panel.click_button_pin                      1.30!^            # click button        ; GLCD EXP1 Pin 2
+panel.buzz_pin                              1.31              # pin for buzzer      ; GLCD EXP1 Pin 1
+panel.button_pause_pin                      2.11^             # kill/pause          ; GLCD EXP2 Pin 8 either
+panel.back_button_pin                       2.11!^            # back button         ; GLCD EXP2 Pin 8 or
 
 # pins used with other panels
 #panel.up_button_pin                         0.1!              # up button if used
@@ -183,13 +185,22 @@ panel.bed_temperature                        60                # temp to set bed
 
 # Example of a custom menu entry, which will show up in the Custom entry. 
 # NOTE _ gets converted to space in the menu and commands, | is used to separate multiple commands
-custom_menu.power_on.enable                true              #
-custom_menu.power_on.name                  Power_on          #
-custom_menu.power_on.command               M80               #
+custom_menu.pen_down.enable                 true              #
+custom_menu.pen_down.name                   Pen_Down          #
+custom_menu.pen_down.command                G92_E-1|G0_E0     #
 
-custom_menu.power_off.enable               true              #
-custom_menu.power_off.name                 Power_off         #
-custom_menu.power_off.command              M81               #
+custom_menu.pen_up.enable                   true              #
+custom_menu.pen_up.name                     Pen_Up            #
+custom_menu.pen_up.command                  G92_E0|G0_E-1     #
+
+custom_menu.motors_on.enable                true              #
+custom_menu.motors_on.name                  Motors_on         #
+custom_menu.motors_on.command               M17               #
+
+custom_menu.motors_off.enable               true              #
+custom_menu.motors_off.name                 Motors_off        #
+custom_menu.motors_off.command              M84               #
+
 
 # Only needed on a smoothieboard
 currentcontrol_module_enable                 true             #
