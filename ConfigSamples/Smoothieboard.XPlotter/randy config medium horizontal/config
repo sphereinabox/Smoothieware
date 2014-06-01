@@ -13,7 +13,7 @@ gamma_steps_per_mm                           32               # Steps per mm for
 delta_steps_per_mm                           32               # Steps per mm for delta stepper
 
 # Planner module configuration : Look-ahead and acceleration configuration
-planner_queue_size                           64               # Size of the planning queue, must be a power of 2. 128 seems to be the maximum.
+planner_queue_size                           32               # Size of the planning queue, must be a power of 2. 128 seems to be the maximum.
 acceleration                                 3000             # Acceleration in mm/second/second.
 acceleration_ticks_per_second                1000             # Number of times per second the speed is updated
 junction_deviation                           0.05             # Similar to the old "max_jerk", in millimeters, see : https://github.com/grbl/grbl/blob/master/planner.c#L409
@@ -201,6 +201,13 @@ custom_menu.motors_off.enable               true              #
 custom_menu.motors_off.name                 Motors_off        #
 custom_menu.motors_off.command              M84               #
 
+custom_menu.to_0_0.enable                   true              #
+custom_menu.to_0_0.name                     Go_to_X0_Y0       #
+custom_menu.to_0_0.command                  G0_X0_Y0          #
+
+custom_menu.reset_speeds.enable             true                #
+custom_menu.reset_speeds.name               Reset_speed          #
+custom_menu.reset_speeds.command            M204_S3000|M220_S100 #
 
 # Only needed on a smoothieboard
 currentcontrol_module_enable                 true             #
