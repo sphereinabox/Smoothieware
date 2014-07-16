@@ -35,12 +35,12 @@ alpha_en_pin                                 0.4              # Pin for alpha en
 alpha_current                                1.0              # Alpha stepper motor current
 
 beta_step_pin                                2.1              # Pin for beta stepper step signal
-beta_dir_pin                                 0.11             # Pin for beta stepper direction
+beta_dir_pin                                 0.11!            # Pin for beta stepper direction
 beta_en_pin                                  0.10             # Pin for beta enable
 beta_current                                 1.0              # Beta stepper motor current
 
 gamma_step_pin                               2.2              # Pin for gamma stepper step signal
-gamma_dir_pin                                0.20!            # Pin for gamma stepper direction
+gamma_dir_pin                                0.20            # Pin for gamma stepper direction
 gamma_en_pin                                 0.19             # Pin for gamma enable
 gamma_current                                1.0              # Gamma stepper motor current
 
@@ -51,10 +51,10 @@ delta_current                                1.0              # Delta stepper mo
 
 # ZAR plotter machine size
 # Machine width minus carriage width
-# 418mm wide, 434mm tall
+# 406mm wide, 406mm tall
 # 68mm square carriage
-zar_cartesian_width                          367.0
-zar_cartesian_height                         367.0
+zar_cartesian_width                          338.0
+zar_cartesian_height                         338.0
 zar_cartesian_depth                          0.0
 
 # Serial communications configuration ( baud rate default to 9600 if undefined )
