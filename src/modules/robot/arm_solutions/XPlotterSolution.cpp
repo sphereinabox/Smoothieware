@@ -1,4 +1,6 @@
 #include "XPlotterSolution.h"
+#include "checksumm.h"
+#include "ConfigValue.h"
 #include <math.h>
 
 // #define cartesian_width  ((23.0f-2.25)*25.4f)
