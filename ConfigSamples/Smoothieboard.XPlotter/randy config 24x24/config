@@ -61,8 +61,8 @@ delta_current                                1.0              # Delta stepper mo
 # Machine width minus carriage width
 # 406mm wide, 406mm tall
 # 68mm square carriage
-zar_cartesian_width                          338.0
-zar_cartesian_height                         338.0
+zar_cartesian_width                          325.0
+zar_cartesian_height                         325.0
 zar_cartesian_depth                          0.0
 
 # Serial communications configuration ( baud rate default to 9600 if undefined )
