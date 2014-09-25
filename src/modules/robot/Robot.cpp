@@ -253,7 +253,7 @@ void Robot::on_config_reload(void *argument)
 
     // initialise actuator positions to current cartesian position (X0 Y0 Z0)
     // so the first move can be correct if homing is not performed
-    float actuator_pos[4];
+    float actuator_pos[4] = {0.0f,0.0f,0.0f,0.0f};
     arm_solution->cartesian_to_actuator(last_milestone, actuator_pos);
     for (int i = 0; i < 4; i++)
         actuators[i]->change_last_milestone(actuator_pos[i]);
@@ -327,7 +327,7 @@ void Robot::on_set_public_data(void *argument)
             this->last_milestone[i] = this->to_millimeters(t[i]);
         }
 
-        float actuator_pos[4];
+        float actuator_pos[4] = {0.0f,0.0f,0.0f,0.0f};
         arm_solution->cartesian_to_actuator(last_milestone, actuator_pos);
         for (int i = 0; i < 4; i++)
             actuators[i]->change_last_milestone(actuator_pos[i]);
@@ -598,7 +598,7 @@ void Robot::reset_axis_position(float x, float y, float z)
     this->transformed_last_milestone[Y_AXIS] = y;
     this->transformed_last_milestone[Z_AXIS] = z;
 
-    float actuator_pos[4];
+    float actuator_pos[4] = {0.0f,0.0f,0.0f,0.0f};
     arm_solution->cartesian_to_actuator(this->last_milestone, actuator_pos);
     for (int i = 0; i < 4; i++)
         actuators[i]->change_last_milestone(actuator_pos[i]);
@@ -610,7 +610,7 @@ void Robot::reset_axis_position(float position, int axis)
     this->last_milestone[axis] = position;
     this->transformed_last_milestone[axis] = position;
 
-    float actuator_pos[4];
+    float actuator_pos[4] = {0.0f,0.0f,0.0f,0.0f};
     arm_solution->cartesian_to_actuator(this->last_milestone, actuator_pos);
 
     for (int i = 0; i < 4; i++)
@@ -623,7 +623,7 @@ void Robot::append_milestone( float target[], float rate_mm_s )
 {
     float deltas[3];
     float unit_vec[3];
-    float actuator_pos[4];
+    float actuator_pos[4] = {0.0f,0.0f,0.0f,0.0f};
     float transformed_target[3]; // adjust target for bed compensation
     float millimeters_of_travel;
 
