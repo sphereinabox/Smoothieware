@@ -532,9 +532,8 @@ PT_THREAD(handle_input(struct httpd_state *s))
                     strncpy(s->upload_name, &s->inputbuf[12], sizeof(s->upload_name) - 1);
                     DEBUG_PRINTF("Upload name= %s\n", s->upload_name);
 
-                } else if (strncmp(s->inputbuf, http_cache_control, sizeof(http_cache_control) - 1) == 0) {
-                    s->inputbuf[PSOCK_DATALEN(&s->sin) - 2] = 0;
-                    s->cache_page = strncmp(http_no_cache, &s->inputbuf[sizeof(http_cache_control) - 1], sizeof(http_no_cache) - 1) != 0;
+                } else if (strncmp(s->inputbuf, http_if_modified_since, sizeof(http_if_modified_since) - 1) == 0) {
+                    s->cache_page = 1;
                     DEBUG_PRINTF("cache page= %d\n", s->cache_page);
                 }
             }
