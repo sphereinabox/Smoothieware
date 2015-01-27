@@ -85,6 +85,7 @@
 
 #define GET  1
 #define POST 2
+#define OPTIONS 3
 
 #define ISO_nl      0x0a
 #define ISO_space   0x20
@@ -341,7 +342,12 @@ PT_THREAD(handle_output(struct httpd_state *s))
                 PT_WAIT_THREAD(&s->outputpt, send_headers(s, http_header_503));
                 PSOCK_SEND_STR(&s->sout, "FAILED\r\n");
             } else {
-                PT_WAIT_THREAD(&s->outputpt, send_headers(s, http_header_200));
+                // PT_WAIT_THREAD(&s->outputpt, send_headers(s, http_header_200));
+                PT_WAIT_THREAD(&s->outputpt, send_headers(s, 
+					"HTTP/1.0 200 OK\r\nServer: uIP/1.0\r\nConnection: close\r\n"
+					"Access-Control-Allow-Origin: *\r\n" 
+					"Access-Control-Allow-Methods: POST, GET, OPTIONS\r\n"
+					"Access-Control-Allow-Headers: Content-Type, X-Filename\r\n"));
                 PSOCK_SEND_STR(&s->sout, "OK\r\n");
             }
 
@@ -352,7 +358,21 @@ PT_THREAD(handle_output(struct httpd_state *s))
             PT_WAIT_THREAD(&s->outputpt, send_headers(s, http_header_404));
             PT_WAIT_THREAD(&s->outputpt, send_file(s));
         }
-
+    } else if (s->method == OPTIONS) {
+        // See https://developer.mozilla.org/en-US/docs/Web/HTTP/Access_control_CORS for why
+        DEBUG_PRINTF("Received OPTIONS request\n");
+		// Send headers to allow cross-origin uploads:
+		PT_WAIT_THREAD(&s->outputpt, send_headers(s, 
+		"HTTP/1.0 200 OK\r\n"
+		"Server: uIP/1.0\r\n"
+		"Access-Control-Allow-Origin: *\r\n" 
+		"Access-Control-Allow-Methods: POST, GET, OPTIONS\r\n"
+		"Access-Control-Allow-Headers: Content-Type, X-Filename\r\n"
+		"Vary: Accept-Encoding, Origin\r\n"
+		"Content-Encoding: gzip\r\n"
+		"Content-Length: 0\r\n"
+		"Connection: close\r\n"
+		"Content-Type: text/plain\r\n\r\n"));
     } else {
         // Presume method GET
         if (!fs_open(s)) { // Note this has the side effect of opening the file
@@ -475,12 +495,14 @@ PT_THREAD(handle_input(struct httpd_state *s))
         s->method = GET;
     } else if (strncmp(s->inputbuf, http_post, 4) == 0) {
         s->method = POST;
+    } else if (strncmp(s->inputbuf, http_options, 8) == 0) {
+        s->method = OPTIONS;
     } else {
         DEBUG_PRINTF("Unexpected method: %s\n", s->inputbuf);
         PSOCK_CLOSE_EXIT(&s->sin);
     }
 
-    DEBUG_PRINTF("Method: %s\n", s->method == POST ? "POST" : "GET");
+    DEBUG_PRINTF("Method: %s\n", s->method == POST ? "POST" : s->method == OPTIONS ? "OPTIONS" : "GET");
 
     PSOCK_READTO(&s->sin, ISO_space);
 
@@ -509,7 +531,7 @@ PT_THREAD(handle_input(struct httpd_state *s))
             s->inputbuf[PSOCK_DATALEN(&s->sin) - 1] = 0;
             if (s->inputbuf[0] == '\r') {
                 DEBUG_PRINTF("end of headers\n");
-                if (s->method == GET) {
+                if (s->method == GET || s->method == OPTIONS) {
                     s->state = STATE_OUTPUT;
                     break;
                 } else if (s->method == POST) {
