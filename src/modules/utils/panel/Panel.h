@@ -9,6 +9,8 @@
 #define PANEL_H
 
 #include "Button.h"
+#include "Pin.h"
+#include "mbed.h"
 #include <string>
 using std::string;
 
@@ -19,6 +21,9 @@ using std::string;
 
 class LcdBase;
 class PanelScreen;
+class ModifyValuesScreen;
+class SDCard;
+class SDFAT;
 
 class Panel : public Module {
     public:
@@ -30,8 +35,10 @@ class Panel : public Module {
         uint32_t button_tick(uint32_t dummy);
         uint32_t encoder_tick(uint32_t dummy);
         void on_idle(void* argument);
+        void on_halt(void* argument);
         void on_main_loop(void* argument);
         void on_gcode_received(void* argument);
+        void on_second_tick(void* argument);
         void enter_screen(PanelScreen* screen);
         void reset_counter();
 
@@ -68,33 +75,38 @@ class Panel : public Module {
 
         // file playing from sd
         bool is_playing() const;
+        bool is_suspended() const;
         void set_playing_file(string f);
         const char* get_playing_file() { return playing_file; }
 
         string getMessage() { return message; }
         bool hasMessage() { return message.size() > 0; }
+        bool is_halted() const { return halted; }
+
+        uint16_t get_screen_lines() const { return screen_lines; }
 
         // public as it is directly accessed by screens... not good
         // TODO pass lcd into ctor of each sub screen
         LcdBase* lcd;
         PanelScreen* custom_screen;
-        PanelScreen* temperature_screen;
 
         // as panelscreen accesses private fields in Panel
         friend class PanelScreen;
 
     private:
-        void setup_temperature_screen();
+
+        // external SD card
+        bool mount_external_sd(bool on);
+        Pin sdcd_pin;
+        PinName extsd_spi_cs;
+        SDCard *sd;
+        SDFAT *extmounter;
 
         // Menu
-        char menu_offset;
         int menu_selected_line;
         int menu_start_line;
         int menu_rows;
         int panel_lines;
-        bool menu_changed;
-        bool control_value_changed;
-        uint16_t menu_current_line;
 
         // Control
         float normal_increment;
@@ -108,17 +120,8 @@ class Panel : public Module {
         Button pause_button;
 
         int* counter;
-        volatile bool counter_changed;
-        volatile bool click_changed;
-        volatile bool refresh_flag;
-        volatile bool do_buttons;
-        volatile bool do_encoder;
 
         int idle_time;
-        bool start_up;
-        int encoder_click_resolution;
-        char mode;
-        uint16_t screen_lines;
 
         PanelScreen* top_screen;
         PanelScreen* current_screen;
@@ -127,8 +130,28 @@ class Panel : public Module {
         float default_hotend_temperature;
         float default_bed_temperature;
 
-        char playing_file[20];
         string message;
+
+        uint16_t screen_lines;
+        uint16_t menu_current_line;
+        char playing_file[20];
+        uint8_t extsd_spi_channel;
+
+        volatile struct {
+            bool start_up:1;
+            bool menu_changed:1;
+            bool control_value_changed:1;
+            bool external_sd_enable:1;
+            bool halted:1;
+            volatile bool counter_changed:1;
+            volatile bool click_changed:1;
+            volatile bool refresh_flag:1;
+            volatile bool do_buttons:1;
+            volatile bool do_encoder:1;
+            char mode:2;
+            char menu_offset:3;
+            int encoder_click_resolution:3;
+        };
 };
 
 #endif
