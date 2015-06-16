@@ -148,7 +148,7 @@ void MainMenuScreen::clicked_menu_entry(uint16_t line)
 void MainMenuScreen::abort_playing()
 {
     //PublicData::set_value(player_checksum, abort_play_checksum, NULL);
-    send_command("abort");
+    send_command("abort 1");
     THEPANEL->enter_screen(this->watch_screen);
 }
 

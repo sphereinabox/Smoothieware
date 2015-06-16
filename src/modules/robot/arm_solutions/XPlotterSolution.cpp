@@ -53,9 +53,17 @@ void XPlotterSolution::cartesian_to_actuator( float cartesian_mm[], float actuat
 }
 
 void XPlotterSolution::actuator_to_cartesian( float actuator_mm[], float cartesian_mm[] ){
-	// FIXME: implement using actuator_mm
+	float base_distance = 
+		mag2d(.5f*(this->cartesian_width), .5f*(this->cartesian_height)/*, this->cartesian_depth*/);
 
-    cartesian_mm[X_AXIS] = 0.0F;
-    cartesian_mm[Y_AXIS] = 0.0F;
+	float a = actuator_mm[0] + base_distance;
+	float b = actuator_mm[1] + base_distance;
+	// Use only top left (A) and top right (B) string lengths, and machine size to find x/y
+	// (Math derives from pythagorean theorem)
+	float xprime = (this->cartesian_width * this->cartesian_width + a * a + b * b) / ( 2.0f * this->cartesian_width);
+	float yprime = sqrtf(a * a - xprime * xprime);
+
+    cartesian_mm[X_AXIS] = xprime - 0.5f * this->cartesian_width;
+    cartesian_mm[Y_AXIS] = 0.5f * this->cartesian_height - yprime;
     cartesian_mm[Z_AXIS] = 0.0F;
 }
