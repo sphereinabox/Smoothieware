@@ -14,13 +14,13 @@ delta_steps_per_mm                           64               # Steps per mm for
 # ZAR plotter machine size
 # Machine width minus carriage width
 # carriage is usually 80mm square
-zar_cartesian_width                          400              #           
-zar_cartesian_height                         481              #           
+zar_cartesian_width                          320              #           
+zar_cartesian_height                         480              #           
 zar_cartesian_depth                          0.0
 
 # Planner module configuration : Look-ahead and acceleration configuration
 planner_queue_size                           32               # DO NOT CHANGE THIS UNLESS YOU KNOW EXACTLY WHAT YOUR ARE DOING
-acceleration                                 1000             # Acceleration in mm/second/second.
+acceleration                                 1500             # Acceleration in mm/second/second.
 #z_acceleration                              500              # Acceleration for Z only moves in mm/s^2, 0 disables it, disabled by default. DO NOT SET ON A DELTA
 acceleration_ticks_per_second                1000             # Number of times per second the speed is updated
 junction_deviation                           0.05             # Similar to the old "max_jerk", in millimeters, see : https://github.com/grbl/grbl/blob/master/planner.c#L409
@@ -269,7 +269,7 @@ custom_menu.to_0_0.command                  G0_X0_Y0          #
 
 custom_menu.reset_speeds.enable             true                #
 custom_menu.reset_speeds.name               Reset_speed          #
-custom_menu.reset_speeds.command            M204_S3000|M220_S100 #
+custom_menu.reset_speeds.command            M204_S1500|M220_S100 #
 
 
 # Azteeg specific settings do not change
