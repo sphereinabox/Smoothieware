@@ -232,7 +232,7 @@ panel.encoder_a_pin                          3.25!^            # encoder pin
 panel.encoder_b_pin                          3.26!^            # encoder pin
 panel.click_button_pin                       2.11!^            # click button
 panel.a0_pin                                 2.6               # st7565 needs an a0
-#panel.contrast                               18                # override contrast setting (default is 18)
+panel.contrast                               2                # override contrast setting (default is 18)
 #panel.encoder_resolution                     2                 # override number of clicks to move 1 item (default is 2)
 panel.menu_offset                            1                 # here controls how sensitive the menu is. some panels will need 1
 
